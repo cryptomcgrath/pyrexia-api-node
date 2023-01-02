@@ -9,6 +9,7 @@ if (process.env.TOKEN_KEY == null) {
     crypto.randomBytes(48, (err, buffer) => {
         var token = buffer.toString('hex');
         process.env.TOKEN_KEY = token
+        console.log('Using new random generated TOKEN_KEY in memory')
     })
 }
 

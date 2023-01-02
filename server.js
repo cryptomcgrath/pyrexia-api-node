@@ -1,9 +1,9 @@
 // create app
-var express = require("express")
-var app = express()
+const express = require("express")
+const app = express()
 
-var db = require("./database.js")
-var md5 = require("md5")
+const db = require("./database.js")
+const md5 = require("md5")
 
 const swaggerJSDoc = require('swagger-jsdoc')
 const swaggerDefinition = require('./swaggerdef.json')
@@ -13,7 +13,7 @@ const options = {
 }
 const swaggerSpec = swaggerJSDoc(options)
 
-var swaggerUi = require('swagger-ui-express')
+const swaggerUi = require('swagger-ui-express')
 
 const usersRouter = require('./routes/users.js')
 const sensorsRouter = require('./routes/sensors.js')
@@ -26,9 +26,9 @@ const statRouter = require('./routes/stat.js')
 require("dotenv").config()
 
 // server listen
-var PORT = process.env.PORT || 8000
+const PORT = process.env.PORT || 8000
 app.listen(PORT, ()=> {
-    console.log("Server running on %PORT%".replace("%PORT%", PORT))
+    console.log("Server running on PORT=%PORT%".replace("%PORT%", PORT))
 })
 
 // root endpoint
@@ -48,7 +48,7 @@ app.use('/stat', statRouter)
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // default response for any other request
-app.use(function(req, res) {
+app.use((req, res) => {
     res.status(404)
 })
 

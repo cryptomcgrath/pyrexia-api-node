@@ -1,5 +1,5 @@
 {
-  "name": "pyrexia-stat",
+  "name": "pyrexia-api-node",
   "version": "1.0.0",
   "description": "Pyrexia Thermostat API",
   "main": "server.js",
@@ -9,14 +9,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/cryptomcgrath/pyrexia-stat.git"
+    "url": "git+https://github.com/cryptomcgrath/pyrexia-api-node.git"
   },
   "author": "Ed McGrath",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/cryptomcgrath/pyrexia-stat/issues"
+    "url": "https://github.com/cryptomcgrath/pyrexia-api-node/issues"
   },
-  "homepage": "https://github.com/cryptomcgrath/pyrexia-stat#readme",
+  "homepage": "https://github.com/cryptomcgrath/pyrexia-api-node#readme",
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "crypto": "^1.0.1",
