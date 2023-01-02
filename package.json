@@ -1,0 +1,33 @@
+{
+  "name": "pyrexia-stat",
+  "version": "1.0.0",
+  "description": "Pyrexia Thermostat API",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cryptomcgrath/pyrexia-stat.git"
+  },
+  "author": "Ed McGrath",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/cryptomcgrath/pyrexia-stat/issues"
+  },
+  "homepage": "https://github.com/cryptomcgrath/pyrexia-stat#readme",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "crypto": "^1.0.1",
+    "dotenv": "^16.0.3",
+    "email-validator": "^2.0.4",
+    "express": "^4.18.1",
+    "express-oas-generator": "^1.0.45",
+    "jsonwebtoken": "^9.0.0",
+    "md5": "^2.3.0",
+    "sqlite3": "^5.0.11",
+    "swagger-jsdoc": "^6.2.5",
+    "swagger-ui-express": "^4.5.0"
+  }
+}
