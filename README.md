@@ -12,5 +12,5 @@ npm run start
 >\
 > Server running on PORT=8000\
 > Connected to database file DBFILENAME=db.pyrexia\
-> Created new TOKEN_KEY in memory since TOKEN_KEY was not specified in .env\
+> Using new random generated TOKEN_KEY in memory
 
