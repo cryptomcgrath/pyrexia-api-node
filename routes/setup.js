@@ -1,12 +1,10 @@
-// create app
-var express = require("express")
-var db = require("../database.js")
-var md5 = require("md5")
+const express = require("express")
+const db = require("../database.js")
 const auth = require("../middleware/auth.js")
 
 const router = express.Router()
 
-var bodyParser = require("body-parser")
+const bodyParser = require("body-parser")
 router.use(bodyParser.urlencoded({ extended: false }))
 router.use(bodyParser.json())
 

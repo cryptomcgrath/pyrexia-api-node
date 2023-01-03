@@ -1,7 +1,8 @@
-var db = require("../database.js")
-var createError = require("http-errors")
+const db = require("../database.js")
+const createError = require("http-errors")
 const jwt = require("jsonwebtoken")
-var crypto = require("crypto")
+const crypto = require("crypto")
+
 require("dotenv").config()
 
 // create TOKEN_KEY if not exists in .env file

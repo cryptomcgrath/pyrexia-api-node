@@ -1,7 +1,5 @@
-// create app
-var express = require("express")
-var db = require("../database.js")
-var md5 = require("md5")
+const express = require("express")
+const db = require("../database.js")
 
 const router = express.Router()
 
@@ -87,7 +85,7 @@ router.post("/:id/set", (req, res, next) => {
     }
     var params = [data.value, req.params.id]
     var sql = "update programs set set_point=? where id=?"
-    db.run(sql, params, function (err, result) {
+    db.run(sql, params, (err, result) => {
         if (err){
             res.status(400).json({"error": err.message})
             return

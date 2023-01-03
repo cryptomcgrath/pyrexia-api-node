@@ -1,11 +1,9 @@
-// create app
-var express = require("express")
-var db = require("../database.js")
-var md5 = require("md5")
+const express = require("express")
+const db = require("../database.js")
 
 const router = express.Router()
 
-var bodyParser = require("body-parser")
+const bodyParser = require("body-parser")
 router.use(bodyParser.urlencoded({ extended: false }))
 router.use(bodyParser.json())
 
@@ -46,7 +44,7 @@ router.post("/:id/on", (req, res, next) => {
     var params = [data.update_time, req.params.id]
     db.run(
         'UPDATE controls set last_on_time=?, control_on=1 where id=?',
-        params, function (err, result) {
+        params, (err, result) => {
             if (err){
                 res.status(400).json({"error": err.message})
                 return
@@ -59,44 +57,52 @@ router.post("/:id/on", (req, res, next) => {
     )
 })
 
-router.post("/:id/off", (req, res, next) => {
-    var now_seconds = Math.floor(Date.now() / 1000)
-    var data = { update_time: now_seconds }
-    var params = [data.update_time, data.update_time, req.params.id]
-    db.get('SELECT * from controls where id=?', [req.params.id], (err, row) => {
+const getControlState = (req, res, next) => {
+    const control_id = req.params.id
+    const params = [control_id]
+    db.get('SELECT * from controls where id=?', params, (err, row) => {
         if (err) {
-            res.status(400).json({"error": err.message})
-            return
+            return res.status(400).json({"error": err.message})
         }
-        var control_on = row["control_on"]
-        var last_on_time = row["last_on_time"]
-        var run_time = data.update_time - last_on_time
-        
-        if (control_on == 1 && last_on_time > 0 && run_time < 3600*3) {
-            db.run('UPDATE controls set last_off_time=?, control_on=0, num_cycles=num_cycles+1, total_run=total_run+?-last_on_time where id=?', params, (err, result) => {
-                if (err){
-                    res.status(400).json({"error": err.message})
-                    return
-                }
-                res.json({
-                    "message": "success",
-                    "data": data,
-                })
-            })
-        } else {
-            db.run('UPDATE controls set last_off_time=?, control_on=0', params, (err, result) => {
-                if (err) {
-                    res.status(400).json({"error": err.message})
-                    return
-                }
-                res.json({
-                    "message": "success",
-                    "data": data,
-                })
-            })
-        }
-
+        req.control_id = control_id
+        req.control_on = row["control_on"]
+        req.last_on_time = row["last_on_time"]
+        return next()
     })
+}
+
+router.post("/:id/off", getControlState, (req, res, next) => {
+    const update_time = Math.floor(Date.now() / 1000)
+    const control_id = req.params.id
+    const control_on = req.control_on
+    const last_on_time = req.last_on_time
+    const run_time = update_time - last_on_time
+    const data = { control_id: control_id, update_time: update_time, control_on: control_on, run_time: run_time }         
+    if (control_on == 1 && last_on_time > 0 && run_time < 3600*3) {
+        var params = [update_time, update_time, control_id]
+        db.run('UPDATE controls set last_off_time=?, control_on=0, num_cycles=num_cycles+1, total_run=total_run+?-last_on_time where id=?', params, (err, result) => {
+            if (err){
+                res.status(400).json({"error": err.message})
+                return
+            }
+            res.json({
+                "message": "success",
+                "data": data,
+            })
+        })
+    } else {
+        var params = [req.params.id] 
+        db.run('UPDATE controls set control_on=0 where id=?', params, (err, result) => {
+            if (err) {
+                res.status(400).json({"error": err.message})
+                return
+            }
+            res.json({
+                "message": "success",
+                "data": data,
+            })
+        })
+    }
 })
 
 router.post("/:id/initoff", (req, res, next) => {
@@ -165,7 +171,7 @@ router.post("/", (req, res, next) => {
     }
     var sql ='INSERT INTO controls (name, min_rest, last_off_time, last_on_time, min_run, gpio, gpio_on_hi, control_on,num_cycles,total_run,run_capacity) VALUES (?,?,?,?,?,?,?,0,0,0,?)'
     var params =[data.name, data.min_rest, data.last_off_time, data.last_on_time, data.min_run, data.gpio, data.gpio_on_hi, data.run_capacity]
-    db.run(sql, params, function (err, result) {
+    db.run(sql, params, (err, result) => {
         if (err){
             res.status(400).json({"error": err.message})
             return
@@ -197,7 +203,7 @@ router.patch("/:id", (req, res, next) => {
            run_capacity = COALESCE(?,run_capacity)
            WHERE id = ?`,
         [data.name, data.min_rest, data.min_run, data.gpio, data.gpio_on_hi, data.run_capacity, req.params.id],
-        function (err, result) {
+        (err, result) => {
             if (err){
                 res.status(400).json({"error": res.message})
                 return
@@ -214,13 +220,13 @@ router.delete("/:id", (req, res, next) => {
     db.run(
         'DELETE FROM controls WHERE id = ?',
         req.params.id,
-        function (err, result) {
+        (err, result) => {
             if (err){
                 res.status(400).json({"error": res.message})
                 return
             }
             res.json({"message":"deleted", changes: this.changes})
-    })
+        })
 })
 
 

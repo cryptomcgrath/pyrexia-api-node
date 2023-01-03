@@ -1,11 +1,8 @@
-// create app
-var express = require("express")
-var db = require("../database.js")
-var md5 = require("md5")
-
+const express = require("express")
+const db = require("../database.js")
 const router = express.Router()
 
-var bodyParser = require("body-parser")
+const bodyParser = require("body-parser")
 router.use(bodyParser.urlencoded({ extended: false }))
 router.use(bodyParser.json())
 
@@ -47,9 +44,6 @@ router.post("/", (req, res, next) => {
     if (!req.body.sensor_value){
         errors.push("No sensor_value specified")
     }
-    //if (req.body.control_on != 0 and req.body.control_on != 1){ 
-    //    errors.push("control_on must be 1 or 0")
-    //}
     if (!req.body.action_ts){
         errors.push("No action_ts specified")
     }
@@ -77,7 +71,7 @@ router.post("/", (req, res, next) => {
     }
     var sql ='INSERT INTO history (program_id, set_point, control_id, sensor_id, sensor_value, control_on, action_ts, program_action, control_action) values (?,?,?,?,?,?,?,?,?)'
     var params =[data.program_id, data.set_point, data.control_id, data.sensor_id, data.sensor_value, data.control_on, data.action_ts, data.program_action, data.control_action]
-    db.run(sql, params, function (err, result) {
+    db.run(sql, params, (err, result) => {
         if (err){
             res.status(400).json({"error": err.message})
             return

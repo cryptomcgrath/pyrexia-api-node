@@ -1,10 +1,9 @@
-var express = require("express")
-var db = require("../database.js")
-var md5 = require("md5")
+const express = require("express")
+const db = require("../database.js")
 
 const router = express.Router()
 
-var bodyParser = require("body-parser")
+const bodyParser = require("body-parser")
 router.use(bodyParser.urlencoded({ extended: false }))
 router.use(bodyParser.json())
 
@@ -124,7 +123,7 @@ router.post("/:id/temp", (req, res, next) => {
            value = ?
            WHERE id = ?`,
         [data.update_time, data.value, req.params.id],
-        function (err, result) {
+        (err, result) => {
             if (err){
                 res.status(400).json({"error": res.message})
                 return
@@ -167,7 +166,7 @@ router.post("/", (req, res, next) => {
     }
     var sql ='INSERT INTO sensors (name, sensor_type, addr, update_time, value, update_interval) VALUES (?,?,?,?,?,?)'
     var params =[data.name, data.sensor_type, data.addr, data.update_time, data.value, data.update_interval]
-    db.run(sql, params, function (err, result) {
+    db.run(sql, params, (err, result) => {
         if (err){
             res.status(400).json({"error": err.message})
             return
@@ -199,7 +198,7 @@ router.patch("/:id", (req, res, next) => {
            update_interval = COALESCE(?, update_interval)
            WHERE id = ?`,
         [data.name, data.sensor_type, data.addr, data.update_time, data.value, data.update_interval, req.params.id],
-        function (err, result) {
+        (err, result) => {
             if (err){
                 res.status(400).json({"error": res.message})
                 return
@@ -216,7 +215,7 @@ router.delete("/:id", (req, res, next) => {
     db.run(
         'DELETE FROM sensors WHERE id = ?',
         req.params.id,
-        function (err, result) {
+        (err, result) => {
             if (err){
                 res.status(400).json({"error": res.message})
                 return

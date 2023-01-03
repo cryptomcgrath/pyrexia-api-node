@@ -1,12 +1,10 @@
-// create app
-var express = require("express")
-var db = require("../database.js")
-var md5 = require("md5")
+const express = require("express")
+const db = require("../database.js")
 const auth = require("../middleware/auth.js")
 
 const router = express.Router()
 
-var bodyParser = require("body-parser")
+const bodyParser = require("body-parser")
 router.use(bodyParser.urlencoded({ extended: false }))
 router.use(bodyParser.json())
 
@@ -86,7 +84,7 @@ router.get("/:id", (req, res, next) => {
 router.post("/:id/increase", (req, res, next) => {
     var params = [req.params.id]
     var sql = "update programs set set_point=set_point+1 where id=?"
-    db.run(sql, params, function (err, result) {
+    db.run(sql, params, (err, result) => {
         if (err){
             res.status(400).json({"error": err.message})
             return
@@ -100,7 +98,7 @@ router.post("/:id/increase", (req, res, next) => {
 router.post("/:id/decrease", (req, res, next) => {
     var params =[req.params.id]
     var sql = "update programs set set_point=set_point-1 where id=?"
-    db.run(sql, params, function (err, result) {
+    db.run(sql, params, (err, result) => {
         if (err){
             res.status(400).json({"error": err.message})
             return
@@ -114,7 +112,7 @@ router.post("/:id/decrease", (req, res, next) => {
 router.post("/:id/enable", (req, res, next) => {
     var params =[req.params.id]
     var sql = "update programs set enabled=1 where id=?"
-    db.run(sql, params, function (err, result) {
+    db.run(sql, params, (err, result) => {
         if (err){
             res.status(400).json({"error": err.message})
             return
@@ -128,7 +126,7 @@ router.post("/:id/enable", (req, res, next) => {
 router.post("/:id/disable", (req, res, next) => {
     var params =[req.params.id]
     var sql = "update programs set enabled=0 where id=?"
-    db.run(sql, params, function (err, result) {
+    db.run(sql, params, (err, result) => {
         if (err){
             res.status(400).json({"error": err.message})
             return

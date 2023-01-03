@@ -1,15 +1,14 @@
-// create app
-var express = require("express")
-var db = require("../database.js")
-var md5 = require("md5")
-var validator = require("email-validator")
-var bcrypt = require("bcryptjs")
-var jwt = require('jsonwebtoken')
+const express = require("express")
+const db = require("../database.js")
+const validator = require("email-validator")
+const bcrypt = require("bcryptjs")
+const jwt = require('jsonwebtoken')
+
 require('dotenv').config()
 
 const router = express.Router()
 
-var bodyParser = require("body-parser")
+const bodyParser = require("body-parser")
 router.use(bodyParser.urlencoded({ extended: false }))
 router.use(bodyParser.json())
 
@@ -44,7 +43,7 @@ router.post("/login", (req, res) => {
         let user = []
         
         var sql = "SELECT * FROM user WHERE email = ?"
-        db.all(sql, email, function(err, rows) {
+        db.all(sql, email, (err, rows) => {
             if (err){
                 res.status(400).json({"error": err.message})
                 return
@@ -105,7 +104,7 @@ router.post("/register", auth.checkNotAlreadyRegistered, (req, res, next) => {
     // add the user
     var sql ='INSERT INTO user (email, password, salt) VALUES (?,?,?)'
     var params =[data.email, data.password, data.salt]
-    db.run(sql, params, function (err, result) {
+    db.run(sql, params, (err, result) => {
         if (err){
             res.status(400).json({"error": err.message})
             return
