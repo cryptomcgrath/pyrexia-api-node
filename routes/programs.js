@@ -3,13 +3,13 @@ const db = require("../database.js")
 
 const router = express.Router()
 
-var bodyParser = require("body-parser")
+const bodyParser = require("body-parser")
 router.use(bodyParser.urlencoded({ extended: false }))
 router.use(bodyParser.json())
 
 router.get("/", (req, res, next) => {
-    var sql = "select * from programs"
-    var params = []
+    const sql = "select * from programs"
+    const params = []
     db.all(sql, params, (err, rows) => {
         if (err) {
             res.status(400).json({"error":err.message})
@@ -23,7 +23,7 @@ router.get("/", (req, res, next) => {
 })
 
 router.get("/run", (req, res, next) => {
-    var sql = `SELECT p.id as program_id,
+    const sql = `SELECT p.id as program_id,
                       p.name as program_name,
                       p.sensor_id,
                       s.name as sensor_name,
@@ -42,7 +42,7 @@ router.get("/run", (req, res, next) => {
         from programs p, sensors s, controls c
         WHERE p.sensor_id = s.id and
         p.control_id = c.id order by p.control_id, p.id`
-    var params = []
+    const params = []
     db.all(sql, params, (err, rows) => {
         if (err){
             res.status(400).json({"error": res.messing})
@@ -56,8 +56,8 @@ router.get("/run", (req, res, next) => {
 })
 
 router.get("/:id", (req, res, next) => {
-    var sql = "select * from programs where id = ?"
-    var params = [req.params.id]
+    const sql = "select * from programs where id = ?"
+    const params = [req.params.id]
     db.get(sql, params, (err, row) => {
         if (err) {
           res.status(400).json({"error":err.message})
@@ -71,7 +71,7 @@ router.get("/:id", (req, res, next) => {
 })
 
 router.post("/:id/set", (req, res, next) => {
-    var errors=[]
+    const errors=[]
     if (!req.body.value){
         errors.push("Missing value")
     }
@@ -80,12 +80,12 @@ router.post("/:id/set", (req, res, next) => {
         return
     }
 
-    var data = {
+    const data = {
         value: req.body.value
     }
-    var params = [data.value, req.params.id]
-    var sql = "update programs set set_point=? where id=?"
-    db.run(sql, params, (err, result) => {
+    const params = [data.value, req.params.id]
+    const sql = "update programs set set_point=? where id=?"
+    db.run(sql, params, (err, dbresult) => {
         if (err){
             res.status(400).json({"error": err.message})
             return
@@ -98,7 +98,7 @@ router.post("/:id/set", (req, res, next) => {
 })
 
 router.post("/:id/action", (req, res, next) => {
-    var errors=[]
+    const errors=[]
     if (!req.body.action){
         errors.push("Missing action")
     }
@@ -107,12 +107,12 @@ router.post("/:id/action", (req, res, next) => {
         return
     }
 
-    var data = {
+    const data = {
         last_action: req.body.action
     }
-    var params = [data.last_action, req.params.id]
-    var sql = "update programs set last_action=? where id=?"
-    db.run(sql, params, (err, result) => {
+    const params = [data.last_action, req.params.id]
+    const sql = "update programs set last_action=? where id=?"
+    db.run(sql, params, (err, dbresult) => {
         if (err){
             res.status(400).json({"error": err.message})
             return
@@ -126,7 +126,7 @@ router.post("/:id/action", (req, res, next) => {
 
 
 router.post("/", (req, res, next) => {
-    var errors=[]
+    const errors=[]
     if (!req.body.name){
         errors.push("Missing name")
     }
@@ -149,7 +149,7 @@ router.post("/", (req, res, next) => {
         res.status(400).json({"error":errors.join(",")})
         return
     }
-    var data = {
+    const data = {
         name: req.body.name,
         mode: req.body.mode,
         enabled: req.body.enabled,
@@ -157,9 +157,15 @@ router.post("/", (req, res, next) => {
         set_point: req.body.set_point,
         control_id: req.body.control_id
     }
-    var sql ='INSERT INTO programs (name, mode, enabled, sensor_id, set_point, control_id) VALUES (?,?,?,?,?,?)'
-    var params =[data.name, data.mode, data.enabled, data.sensor_id, data.set_point, data.control_id]
-    db.run(sql, params, (err, result) => {
+    const sql =`INSERT INTO programs (
+        name, 
+        mode, 
+        enabled, 
+        sensor_id, 
+        set_point, 
+        control_id) VALUES (?,?,?,?,?,?)`
+    const params =[data.name, data.mode, data.enabled, data.sensor_id, data.set_point, data.control_id]
+    db.run(sql, params, (err, dbresult) => {
         if (err){
             res.status(400).json({"error": err.message})
             return
@@ -173,7 +179,7 @@ router.post("/", (req, res, next) => {
 })
 
 router.patch("/:id", (req, res, next) => {
-    var data = {
+    const data = {
         name: req.body.name,
         mode: req.body.mode,
         enabled: req.body.enabled,
@@ -192,7 +198,7 @@ router.patch("/:id", (req, res, next) => {
            WHERE id = ?`,
         [data.name, data.mode, data.enabled, data.sensor_id, data.set_point, data.control_id, req.params.id],
 
-        (err, result) => {
+        (err, dbresult) => {
             if (err){
                 res.status(400).json({"error": err.message})
                 return
@@ -209,7 +215,7 @@ router.delete("/:id", (req, res, next) => {
     db.run(
         'DELETE FROM programs WHERE id = ?',
         req.params.id,
-        (err, result) => {
+        (err, dbresult) => {
             if (err){
                 res.status(400).json({"error": err.message})
                 return

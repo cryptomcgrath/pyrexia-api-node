@@ -4,9 +4,8 @@ const db = require("../database.js")
 const router = express.Router()
 
 const bodyParser = require("body-parser")
-router.use(bodyParser.urlencoded({ extended: false }))
+router.use(bodyParser.urlencoded({extended: false}))
 router.use(bodyParser.json())
-
 
 
 /**
@@ -32,7 +31,7 @@ router.use(bodyParser.json())
  *           type: string
  *           description: The address of the sensor, for dht22 the gpio pin, for sp the mac address
  *           example: 6
- *           
+ *
  */
 
 
@@ -44,7 +43,7 @@ router.use(bodyParser.json())
  *     description: Retrieve a list of sensors
  *     responses:
  *       200:
- *         description: Success - A list of sensors 
+ *         description: Success - A list of sensors
  *         content:
  *           application/json:
  *             schema:
@@ -56,16 +55,16 @@ router.use(bodyParser.json())
  *                     $ref: '#/components/schemas/Sensor'
  */
 router.get("/", (req, res, next) => {
-    var sql = "select * from sensors"
-    var params = []
+    const sql = "select * from sensors"
+    const params = []
     db.all(sql, params, (err, rows) => {
         if (err) {
-            res.status(400).json({"error":err.message})
+            res.status(400).json({"error": err.message})
             return
         }
         res.json({
-            "message":"success",
-            "data":rows
+            "message": "success",
+            "data": rows
         })
     })
 })
@@ -96,23 +95,23 @@ router.get("/", (req, res, next) => {
  *                   $ref: '#components/schemas/Sensor'
  */
 router.get("/:id", (req, res, next) => {
-    var sql = "select * from sensors where id = ?"
-    var params = [req.params.id]
+    const sql = "select * from sensors where id = ?"
+    const params = [req.params.id]
     db.get(sql, params, (err, row) => {
         if (err) {
-          res.status(400).json({"error":err.message})
-          return
+            res.status(400).json({"error": err.message})
+            return
         }
         res.json({
-            "message":"success",
-            "data":row
+            "message": "success",
+            "data": row
         })
-      })
+    })
 })
 
 
 router.post("/:id/temp", (req, res, next) => {
-    var data = {
+    const data = {
         value: req.body.value,
         update_time: req.body.update_time
     }
@@ -123,8 +122,8 @@ router.post("/:id/temp", (req, res, next) => {
            value = ?
            WHERE id = ?`,
         [data.update_time, data.value, req.params.id],
-        (err, result) => {
-            if (err){
+        (err, dbresult) => {
+            if (err) {
                 res.status(400).json({"error": res.message})
                 return
             }
@@ -133,30 +132,30 @@ router.post("/:id/temp", (req, res, next) => {
                 data: data,
                 changes: this.changes
             })
-    })
+        })
 
 })
 
 
 router.post("/", (req, res, next) => {
-    var errors=[]
-    if (!req.body.name){
+    const errors = []
+    if (!req.body.name) {
         errors.push("No name specified")
     }
     if (!req.body.sensor_type) {
         errors.push("Missing sensor_type")
     }
-    if (!req.body.addr){
+    if (!req.body.addr) {
         errors.push("No addr specified")
     }
     if (!req.body.update_interval) {
         errors.push("Missing update_interval")
     }
-    if (errors.length){
-        res.status(400).json({"error":errors.join(",")})
+    if (errors.length) {
+        res.status(400).json({"error": errors.join(",")})
         return
     }
-    var data = {
+    const data = {
         name: req.body.name,
         sensor_type: req.body.sensor_type,
         addr: req.body.addr,
@@ -164,27 +163,27 @@ router.post("/", (req, res, next) => {
         value: 0,
         update_interval: req.body.update_interval
     }
-    var sql ='INSERT INTO sensors (name, sensor_type, addr, update_time, value, update_interval) VALUES (?,?,?,?,?,?)'
-    var params =[data.name, data.sensor_type, data.addr, data.update_time, data.value, data.update_interval]
-    db.run(sql, params, (err, result) => {
-        if (err){
+    const sql = 'INSERT INTO sensors (name, sensor_type, addr, update_time, value, update_interval) VALUES (?,?,?,?,?,?)'
+    const params = [data.name, data.sensor_type, data.addr, data.update_time, data.value, data.update_interval]
+    db.run(sql, params, (err, dbresult) => {
+        if (err) {
             res.status(400).json({"error": err.message})
             return
         }
         res.json({
             "message": "success",
             "data": data,
-            "id" : this.lastID
+            "id": this.lastID
         })
     })
 })
 
 router.patch("/:id", (req, res, next) => {
-    var data = {
+    const data = {
         name: req.body.name,
         sensor_type: req.body.sensor_type,
         addr: req.body.addr,
-        update_time : req.body.update_time,
+        update_time: req.body.update_time,
         value: req.body.value,
         update_interval: req.body.update_interval
     }
@@ -198,8 +197,8 @@ router.patch("/:id", (req, res, next) => {
            update_interval = COALESCE(?, update_interval)
            WHERE id = ?`,
         [data.name, data.sensor_type, data.addr, data.update_time, data.value, data.update_interval, req.params.id],
-        (err, result) => {
-            if (err){
+        (err, dbresult) => {
+            if (err) {
                 res.status(400).json({"error": res.message})
                 return
             }
@@ -208,20 +207,20 @@ router.patch("/:id", (req, res, next) => {
                 data: data,
                 changes: this.changes
             })
-    })
+        })
 })
 
 router.delete("/:id", (req, res, next) => {
     db.run(
         'DELETE FROM sensors WHERE id = ?',
         req.params.id,
-        (err, result) => {
-            if (err){
+        (err, dbresult) => {
+            if (err) {
                 res.status(400).json({"error": res.message})
                 return
             }
-            res.json({"message":"deleted", changes: this.changes})
-    })
+            res.json({"message": "deleted", changes: this.changes})
+        })
 })
 
 

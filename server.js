@@ -3,7 +3,6 @@ const express = require("express")
 const app = express()
 
 const db = require("./database.js")
-const md5 = require("md5")
 
 const swaggerJSDoc = require('swagger-jsdoc')
 const swaggerDefinition = require('./swaggerdef.json')

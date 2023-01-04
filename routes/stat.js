@@ -5,11 +5,11 @@ const auth = require("../middleware/auth.js")
 const router = express.Router()
 
 const bodyParser = require("body-parser")
-router.use(bodyParser.urlencoded({ extended: false }))
+router.use(bodyParser.urlencoded({extended: false}))
 router.use(bodyParser.json())
 
 router.get("/list", auth.verifyToken, (req, res, next) => {
-    var sql = `SELECT p.id as program_id,
+    const sql = `SELECT p.id as program_id,
                       p.name as program_name,
                       p.sensor_id,
                       s.name as sensor_name,
@@ -32,23 +32,23 @@ router.get("/list", auth.verifyToken, (req, res, next) => {
         from programs p, sensors s, controls c
         WHERE p.sensor_id = s.id and
         p.control_id = c.id order by p.control_id, p.id`
-    var params = []
+    const params = []
     db.all(sql, params, (err, rows) => {
-        if (err){
+        if (err) {
             res.status(400).json({"error": res.messing})
             return
         }
-        var now_seconds = Math.floor(Date.now() / 1000)
+        const now_seconds = Math.floor(Date.now() / 1000)
         res.json({
-           "message":"success",
-           "data":rows,
-           "current_time":now_seconds
+            "message": "success",
+            "data": rows,
+            "current_time": now_seconds
         })
-    })      
+    })
 })
 
 router.get("/:id", (req, res, next) => {
-    var sql = `SELECT p.id as program_id,
+    const sql = `SELECT p.id as program_id,
                       p.name as program_name,
                       p.sensor_id,
                       s.name as sensor_name,
@@ -68,24 +68,24 @@ router.get("/:id", (req, res, next) => {
         from programs p, sensors s, controls c
         WHERE p.sensor_id = s.id and
         p.control_id = c.id and p.id = ?`
-    var params = [req.params.id]
+    const params = [req.params.id]
     db.get(sql, params, (err, row) => {
         if (err) {
-          res.status(400).json({"error":err.message})
-          return
+            res.status(400).json({"error": err.message})
+            return
         }
         res.json({
-            "message":"success",
-            "data":row
+            "message": "success",
+            "data": row
         })
-      })
+    })
 })
 
 router.post("/:id/increase", (req, res, next) => {
-    var params = [req.params.id]
-    var sql = "update programs set set_point=set_point+1 where id=?"
-    db.run(sql, params, (err, result) => {
-        if (err){
+    const params = [req.params.id]
+    const sql = "update programs set set_point=set_point+1 where id=?"
+    db.run(sql, params, (err, dbresult) => {
+        if (err) {
             res.status(400).json({"error": err.message})
             return
         }
@@ -96,10 +96,10 @@ router.post("/:id/increase", (req, res, next) => {
 })
 
 router.post("/:id/decrease", (req, res, next) => {
-    var params =[req.params.id]
-    var sql = "update programs set set_point=set_point-1 where id=?"
-    db.run(sql, params, (err, result) => {
-        if (err){
+    const params = [req.params.id]
+    const sql = "update programs set set_point=set_point-1 where id=?"
+    db.run(sql, params, (err, dbresult) => {
+        if (err) {
             res.status(400).json({"error": err.message})
             return
         }
@@ -110,10 +110,10 @@ router.post("/:id/decrease", (req, res, next) => {
 })
 
 router.post("/:id/enable", (req, res, next) => {
-    var params =[req.params.id]
-    var sql = "update programs set enabled=1 where id=?"
-    db.run(sql, params, (err, result) => {
-        if (err){
+    const params = [req.params.id]
+    const sql = "update programs set enabled=1 where id=?"
+    db.run(sql, params, (err, dbresult) => {
+        if (err) {
             res.status(400).json({"error": err.message})
             return
         }
@@ -124,10 +124,10 @@ router.post("/:id/enable", (req, res, next) => {
 })
 
 router.post("/:id/disable", (req, res, next) => {
-    var params =[req.params.id]
-    var sql = "update programs set enabled=0 where id=?"
-    db.run(sql, params, (err, result) => {
-        if (err){
+    const params = [req.params.id]
+    const sql = "update programs set enabled=0 where id=?"
+    db.run(sql, params, (err, dbresult) => {
+        if (err) {
             res.status(400).json({"error": err.message})
             return
         }
@@ -136,7 +136,6 @@ router.post("/:id/disable", (req, res, next) => {
         })
     })
 })
-
 
 
 module.exports = router

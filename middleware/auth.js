@@ -1,5 +1,4 @@
 const db = require("../database.js")
-const createError = require("http-errors")
 const jwt = require("jsonwebtoken")
 const crypto = require("crypto")
 
@@ -8,36 +7,34 @@ require("dotenv").config()
 // create TOKEN_KEY if not exists in .env file
 if (process.env.TOKEN_KEY == null) {
     crypto.randomBytes(48, (err, buffer) => {
-        var token = buffer.toString('hex');
-        process.env.TOKEN_KEY = token
+        process.env.TOKEN_KEY = buffer.toString('hex')
         console.log('Using new random generated TOKEN_KEY in memory')
     })
 }
 
 exports.checkNotAlreadyRegistered = (req, res, next) => {
-  db.get("select * from user limit 1", (err, row) => {
-    if (!err && !row) {
-      next()
-    } else {
-        next(createError(403, "Not authorized"))
-    }
-  })
+    db.get("select * from user limit 1", (err, row) => {
+        if (!err && !row) {
+            next()
+        } else {
+            return res.status(403).send("Not authorized")
+        }
+    })
 }
 
 
 exports.verifyToken = (req, res, next) => {
-  const token =
-    req.body.token || req.query.token || req.headers["x-access-token"]
+    const token =
+        req.body.token || req.query.token || req.headers["x-access-token"]
 
-  if (!token) {
-    return res.status(403).send("A token is required for authentication")
-  }
-  try {
-    const decoded = jwt.verify(token, process.env.TOKEN_KEY)
-    req.user = decoded
-  } catch (err) {
-    return res.status(401).send("Invalid Token")
-  }
-  return next()
+    if (!token) {
+        return res.status(403).send("A token is required for authentication")
+    }
+    try {
+        req.user = jwt.verify(token, process.env.TOKEN_KEY)
+    } catch (err) {
+        return res.status(401).send("Invalid Token")
+    }
+    return next()
 }
 
