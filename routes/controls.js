@@ -120,23 +120,6 @@ router.post("/:id/off", getControlState, (req, res, next) => {
     }
 })
 
-router.post("/:id/initoff", (req, res, next) => {
-    const params = [data.update_time, req.params.id]
-    db.run(
-        'UPDATE controls set last_off_time=?, control_on=0 where id=?',
-        params, (err, dbresult) => {
-            if (err) {
-                res.status(400).json({"error": err.message})
-                return
-            }
-            res.json({
-                "message": "success",
-                "data": data,
-            })
-        }
-    )
-})
-
 router.post("/:id/refill", (req, res, next) => {
     const params = [req.params.id]
     db.run(
