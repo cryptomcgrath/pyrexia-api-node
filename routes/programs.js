@@ -117,7 +117,7 @@ router.post("/:id/action", (req, res, next) => {
         program_id: req.params.id,
         last_action: req.body.action
     }
-    const params = [data.last_action, req.params.program_id]
+    const params = [data.last_action, data.program_id]
     const sql = "update programs set last_action=? where id=?"
     db.run(sql, params, (err, dbresult) => {
         if (err) {
