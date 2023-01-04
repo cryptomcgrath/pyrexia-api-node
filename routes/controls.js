@@ -44,7 +44,7 @@ router.post("/:id/on", (req, res, next) => {
     const params = [data.update_time, req.params.id]
     db.run(
         'UPDATE controls set last_on_time=?, control_on=1 where id=?',
-        params, (err, result) => {
+        params, (err, dbresult) => {
             if (err) {
                 res.status(400).json({"error": err.message})
                 return
@@ -78,31 +78,45 @@ router.post("/:id/off", getControlState, (req, res, next) => {
     const control_on = req.control_on
     const last_on_time = req.last_on_time
     const run_time = update_time - last_on_time
-    const data = {control_id: control_id, update_time: update_time, control_on: control_on, run_time: run_time}
+    const data = {
+        control_id: control_id,
+        update_time: update_time,
+        control_on: control_on,
+        run_time: run_time
+    }
     if (control_on === 1 && last_on_time > 0 && run_time < max_plausible_run_time) {
         const params = [update_time, update_time, control_id]
-        db.run('UPDATE controls set last_off_time=?, control_on=0, num_cycles=num_cycles+1, total_run=total_run+?-last_on_time where id=?', params, (err, result) => {
-            if (err) {
-                res.status(400).json({"error": err.message})
-                return
-            }
-            res.json({
-                "message": "success",
-                "data": data,
+        db.run(`
+            UPDATE controls 
+                set last_off_time=?,
+                control_on=0, 
+                num_cycles=num_cycles+1,
+                total_run=total_run+?-last_on_time
+            where id=?`, params, (err, dbresult) => {
+                if (err) {
+                    res.status(400).json({"error": err.message})
+                    return
+                }
+                res.json({
+                    "message": "success",
+                    "data": data,
+                })
             })
-        })
     } else {
         const params = [req.params.id]
-        db.run('UPDATE controls set control_on=0 where id=?', params, (err, result) => {
-            if (err) {
-                res.status(400).json({"error": err.message})
-                return
-            }
-            res.json({
-                "message": "success",
-                "data": data,
+        db.run(`
+            UPDATE controls
+                set control_on=0
+            where id=?`, params, (err, dbresult) => {
+                if (err) {
+                    res.status(400).json({"error": err.message})
+                    return
+                }
+                res.json({
+                    "message": "success",
+                    "data": data,
+                })
             })
-        })
     }
 })
 
@@ -110,7 +124,7 @@ router.post("/:id/initoff", (req, res, next) => {
     const params = [data.update_time, req.params.id]
     db.run(
         'UPDATE controls set last_off_time=?, control_on=0 where id=?',
-        params, (err, result) => {
+        params, (err, dbresult) => {
             if (err) {
                 res.status(400).json({"error": err.message})
                 return
@@ -127,7 +141,7 @@ router.post("/:id/refill", (req, res, next) => {
     const params = [req.params.id]
     db.run(
         'UPDATE controls set num_cycles=0, total_run=0 where id=?',
-        params, (err, result) => {
+        params, (err, dbresult) => {
             if (err) {
                 res.status(400).json({"error": err.message})
                 return
@@ -170,18 +184,20 @@ router.post("/", (req, res, next) => {
         gpio_on_hi: req.body.gpio_on_hi,
         run_capacity: req.body.run_capacity
     }
-    const sql = `INSERT INTO controls (
-        name,
-        min_rest,
-        last_off_time, 
-        last_on_time, 
-        min_run, 
-        gpio, 
-        gpio_on_hi, 
-        control_on,
-        num_cycles,
-        total_run,
-        run_capacity) VALUES (?,?,?,?,?,?,?,0,0,0,?)`
+    const sql = `
+        INSERT INTO controls (
+            name,
+            min_rest,
+            last_off_time, 
+            last_on_time, 
+            min_run, 
+            gpio, 
+            gpio_on_hi, 
+            control_on,
+            num_cycles,
+            total_run,
+            run_capacity)
+        VALUES (?,?,?,?,?,?,?,0,0,0,?)`
     const params = [
         data.name,
         data.min_rest,
@@ -191,7 +207,7 @@ router.post("/", (req, res, next) => {
         data.gpio,
         data.gpio_on_hi,
         data.run_capacity]
-    db.run(sql, params, (err, result) => {
+    db.run(sql, params, (err, dbresult) => {
         if (err) {
             res.status(400).json({"error": err.message})
             return
@@ -246,7 +262,7 @@ router.delete("/:id", (req, res, next) => {
     db.run(
         'DELETE FROM controls WHERE id = ?',
         req.params.id,
-        (err, result) => {
+        (err, dbresult) => {
             if (err) {
                 res.status(400).json({"error": res.message})
                 return

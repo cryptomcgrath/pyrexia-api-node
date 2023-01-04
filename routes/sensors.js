@@ -112,16 +112,16 @@ router.get("/:id", (req, res, next) => {
 
 router.post("/:id/temp", (req, res, next) => {
     const data = {
+        sensor_id: req.params.id,
         value: req.body.value,
         update_time: req.body.update_time
     }
-
     db.run(
         `UPDATE sensors set
            update_time = ?,
            value = ?
            WHERE id = ?`,
-        [data.update_time, data.value, req.params.id],
+        [data.update_time, data.value, data.sensor_id],
         (err, dbresult) => {
             if (err) {
                 res.status(400).json({"error": res.message})
@@ -163,8 +163,22 @@ router.post("/", (req, res, next) => {
         value: 0,
         update_interval: req.body.update_interval
     }
-    const sql = 'INSERT INTO sensors (name, sensor_type, addr, update_time, value, update_interval) VALUES (?,?,?,?,?,?)'
-    const params = [data.name, data.sensor_type, data.addr, data.update_time, data.value, data.update_interval]
+    const sql = `
+        INSERT INTO sensors (
+            name, 
+            sensor_type, 
+            addr, 
+            update_time, 
+            value, 
+            update_interval) 
+        VALUES (?,?,?,?,?,?)`
+    const params = [
+        data.name,
+        data.sensor_type,
+        data.addr,
+        data.update_time,
+        data.value,
+        data.update_interval]
     db.run(sql, params, (err, dbresult) => {
         if (err) {
             res.status(400).json({"error": err.message})

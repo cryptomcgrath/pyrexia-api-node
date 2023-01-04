@@ -68,16 +68,18 @@ router.post("/", (req, res, next) => {
         program_action: req.body.program_action,
         control_action: req.body.control_action
     }
-    const sql = `INSERT INTO history (
-        program_id,
-        set_point, 
-        control_id, 
-        sensor_id, 
-        sensor_value, 
-        control_on, 
-        action_ts, 
-        program_action, 
-        control_action) values (?,?,?,?,?,?,?,?,?)`
+    const sql = `
+        INSERT INTO history (
+            program_id,
+            set_point, 
+            control_id, 
+            sensor_id, 
+            sensor_value, 
+            control_on, 
+            action_ts, 
+            program_action, 
+            control_action) 
+        values (?,?,?,?,?,?,?,?,?)`
     const params = [
         data.program_id,
         data.set_point,
@@ -88,7 +90,7 @@ router.post("/", (req, res, next) => {
         data.action_ts,
         data.program_action,
         data.control_action]
-    db.run(sql, params, (err, result) => {
+    db.run(sql, params, (err, dbresult) => {
         if (err) {
             res.status(400).json({"error": err.message})
             return
