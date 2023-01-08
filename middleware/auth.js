@@ -13,7 +13,11 @@ if (process.env.TOKEN_KEY == null) {
 }
 
 exports.checkNotAlreadyRegistered = (req, res, next) => {
-    db.get("select * from user limit 1", (err, row) => {
+    let sql = "select * from user limit 1"
+    if (req.body.admin) {
+        sql = "select * from user where access_level=9"
+    }
+    db.get(sql, (err, row) => {
         if (!err && !row) {
             next()
         } else {

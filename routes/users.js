@@ -86,14 +86,24 @@ router.post("/register", auth.checkNotAlreadyRegistered, (req, res, next) => {
         return
     }
     const salt = bcrypt.genSaltSync(10)
+
+    let access_level
+    if (req.body.admin) {
+        access_level = 9
+    } else {
+        access_level = 1
+    }
     const data = {
         email: req.body.email.toLowerCase(),
         salt: salt,
-        password : bcrypt.hashSync(req.body.password, salt)
+        password : bcrypt.hashSync(req.body.password, salt),
+        access_level: access_level
     }
+    // determine access level
+
     // add the user
-    const sql ='INSERT INTO user (email, password, salt) VALUES (?,?,?)'
-    const params =[data.email, data.password, data.salt]
+    const sql ='INSERT INTO user (email, password, salt, access_level) VALUES (?,?,?,?)'
+    const params =[data.email, data.password, data.salt, data.access_level]
     db.run(sql, params, (err, dbresult) => {
         if (err){
             res.status(400).json({"error": err.message})
