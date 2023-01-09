@@ -47,7 +47,7 @@ router.get("/list", auth.verifyToken, (req, res, next) => {
     })
 })
 
-router.get("/:id", (req, res, next) => {
+router.get("/:id", auth.verifyToken, (req, res, next) => {
     const sql = `SELECT p.id as program_id,
                       p.name as program_name,
                       p.sensor_id,
@@ -81,7 +81,7 @@ router.get("/:id", (req, res, next) => {
     })
 })
 
-router.post("/:id/increase", (req, res, next) => {
+router.post("/:id/increase", auth.verifyToken, (req, res, next) => {
     const params = [req.params.id]
     const sql = "update programs set set_point=set_point+1 where id=?"
     db.run(sql, params, (err, dbresult) => {
@@ -95,7 +95,7 @@ router.post("/:id/increase", (req, res, next) => {
     })
 })
 
-router.post("/:id/decrease", (req, res, next) => {
+router.post("/:id/decrease", auth.verifyToken, (req, res, next) => {
     const params = [req.params.id]
     const sql = "update programs set set_point=set_point-1 where id=?"
     db.run(sql, params, (err, dbresult) => {
@@ -109,7 +109,7 @@ router.post("/:id/decrease", (req, res, next) => {
     })
 })
 
-router.post("/:id/enable", (req, res, next) => {
+router.post("/:id/enable", auth.verifyToken, (req, res, next) => {
     const params = [req.params.id]
     const sql = "update programs set enabled=1 where id=?"
     db.run(sql, params, (err, dbresult) => {
@@ -123,7 +123,7 @@ router.post("/:id/enable", (req, res, next) => {
     })
 })
 
-router.post("/:id/disable", (req, res, next) => {
+router.post("/:id/disable", auth.verifyToken,  (req, res, next) => {
     const params = [req.params.id]
     const sql = "update programs set enabled=0 where id=?"
     db.run(sql, params, (err, dbresult) => {

@@ -12,10 +12,12 @@ if (process.env.TOKEN_KEY == null) {
     })
 }
 
+// only allows 1 admin user (pyrexia-stat client)
+// and 1 non-admin user (pyrexia-android client)
 exports.checkNotAlreadyRegistered = (req, res, next) => {
-    let sql = "select * from user limit 1"
+    let sql = "select * from user where access_level is not 9 limit 1"
     if (req.body.admin) {
-        sql = "select * from user where access_level=9"
+        sql = "select * from user where access_level=9 limit 1"
     }
     db.get(sql, (err, row) => {
         if (!err && !row) {
@@ -41,4 +43,3 @@ exports.verifyToken = (req, res, next) => {
     }
     return next()
 }
-
