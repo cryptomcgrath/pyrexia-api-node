@@ -1,5 +1,6 @@
 const express = require("express")
 const db = require("../database.js")
+const auth = require("../middleware/auth.js")
 
 const router = express.Router()
 
@@ -8,7 +9,7 @@ router.use(bodyParser.urlencoded({extended: false}))
 router.use(bodyParser.json())
 
 
-router.get("/", (req, res, next) => {
+router.get("/", auth.verifyToken, (req, res, next) => {
     const sql = "select * from controls"
     const params = []
     db.all(sql, params, (err, rows) => {
@@ -23,7 +24,7 @@ router.get("/", (req, res, next) => {
     })
 })
 
-router.get("/:id", (req, res, next) => {
+router.get("/:id", auth.verifyToken, (req, res, next) => {
     const sql = "select * from controls where id = ?"
     const params = [req.params.id]
     db.get(sql, params, (err, row) => {
@@ -38,7 +39,7 @@ router.get("/:id", (req, res, next) => {
     })
 })
 
-router.post("/:id/on", (req, res, next) => {
+router.post("/:id/on", auth.verifyToken, (req, res, next) => {
     const now_seconds = Math.floor(Date.now() / 1000)
     const data = {update_time: now_seconds}
     const params = [data.update_time, req.params.id]
@@ -71,7 +72,7 @@ const getControlState = (req, res, next) => {
     })
 }
 
-router.post("/:id/off", getControlState, (req, res, next) => {
+router.post("/:id/off", auth.verifyToken, getControlState, (req, res, next) => {
     const max_plausible_run_time = 3600 * 3
     const update_time = Math.floor(Date.now() / 1000)
     const control_id = req.params.id
@@ -120,7 +121,7 @@ router.post("/:id/off", getControlState, (req, res, next) => {
     }
 })
 
-router.post("/:id/refill", (req, res, next) => {
+router.post("/:id/refill", auth.verifyToken, (req, res, next) => {
     const params = [req.params.id]
     db.run(
         'UPDATE controls set num_cycles=0, total_run=0 where id=?',
@@ -136,7 +137,7 @@ router.post("/:id/refill", (req, res, next) => {
     )
 })
 
-router.post("/", (req, res, next) => {
+router.post("/", auth.verifyToken, (req, res, next) => {
     const errors = []
     if (!req.body.name) {
         errors.push("Missing name")
@@ -203,7 +204,7 @@ router.post("/", (req, res, next) => {
     })
 })
 
-router.patch("/:id", (req, res, next) => {
+router.patch("/:id", auth.verifyToken, (req, res, next) => {
     const data = {
         name: req.body.name,
         min_rest: req.body.min_rest,
@@ -241,7 +242,7 @@ router.patch("/:id", (req, res, next) => {
         })
 })
 
-router.delete("/:id", (req, res, next) => {
+router.delete("/:id", auth.verifyToken, (req, res, next) => {
     db.run(
         'DELETE FROM controls WHERE id = ?',
         req.params.id,

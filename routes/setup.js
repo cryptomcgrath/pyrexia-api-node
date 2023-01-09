@@ -45,7 +45,7 @@ router.get("/ping", (req, res, next) => {
 })
 
 // shutdown
-router.post("/shutdown", (req, res, next) => {
+router.post("/shutdown", auth.verifyToken, (req, res, next) => {
    require('child_process').exec('sudo /sbin/shutdown -r now', (msg) => {
        res.json({"message":"success","console":msg})
    }) 

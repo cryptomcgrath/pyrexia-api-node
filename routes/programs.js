@@ -1,5 +1,6 @@
 const express = require("express")
 const db = require("../database.js")
+const auth = require("../middleware/auth.js")
 
 const router = express.Router()
 
@@ -7,7 +8,7 @@ const bodyParser = require("body-parser")
 router.use(bodyParser.urlencoded({extended: false}))
 router.use(bodyParser.json())
 
-router.get("/", (req, res, next) => {
+router.get("/", auth.verifyToken, (req, res, next) => {
     const sql = "select * from programs"
     const params = []
     db.all(sql, params, (err, rows) => {
@@ -22,7 +23,7 @@ router.get("/", (req, res, next) => {
     })
 })
 
-router.get("/run", (req, res, next) => {
+router.get("/run", auth.verifyToken, (req, res, next) => {
     const sql = `
         SELECT 
             p.id as program_id,
@@ -61,7 +62,7 @@ router.get("/run", (req, res, next) => {
     })
 })
 
-router.get("/:id", (req, res, next) => {
+router.get("/:id", auth.verifyToken, (req, res, next) => {
     const sql = "select * from programs where id = ?"
     const params = [req.params.id]
     db.get(sql, params, (err, row) => {
@@ -76,7 +77,7 @@ router.get("/:id", (req, res, next) => {
     })
 })
 
-router.post("/:id/set", (req, res, next) => {
+router.post("/:id/set", auth.verifyToken, (req, res, next) => {
     const errors = []
     if (!req.body.value) {
         errors.push("Missing value")
@@ -103,7 +104,7 @@ router.post("/:id/set", (req, res, next) => {
     })
 })
 
-router.post("/:id/action", (req, res, next) => {
+router.post("/:id/action", auth.verifyToken, (req, res, next) => {
     const errors = []
     if (!req.body.action) {
         errors.push("Missing action")
@@ -131,7 +132,7 @@ router.post("/:id/action", (req, res, next) => {
     })
 })
 
-router.post("/", (req, res, next) => {
+router.post("/", auth.verifyToken, (req, res, next) => {
     const errors = []
     if (!req.body.name) {
         errors.push("Missing name")
@@ -186,7 +187,7 @@ router.post("/", (req, res, next) => {
     })
 })
 
-router.patch("/:id", (req, res, next) => {
+router.patch("/:id", auth.verifyToken, (req, res, next) => {
     const data = {
         name: req.body.name,
         mode: req.body.mode,
@@ -218,7 +219,7 @@ router.patch("/:id", (req, res, next) => {
         })
 })
 
-router.delete("/:id", (req, res, next) => {
+router.delete("/:id", auth.verifyToken, (req, res, next) => {
     db.run(
         'DELETE FROM programs WHERE id = ?',
         req.params.id,

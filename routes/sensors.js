@@ -95,7 +95,7 @@ router.get("/", auth.verifyToken, (req, res, next) => {
  *                 data:
  *                   $ref: '#components/schemas/Sensor'
  */
-router.get("/:id", (req, res, next) => {
+router.get("/:id", auth.verifyToken, (req, res, next) => {
     const sql = "select * from sensors where id = ?"
     const params = [req.params.id]
     db.get(sql, params, (err, row) => {
@@ -111,7 +111,7 @@ router.get("/:id", (req, res, next) => {
 })
 
 
-router.post("/:id/temp", (req, res, next) => {
+router.post("/:id/temp", auth.verifyToken,  (req, res, next) => {
     const data = {
         sensor_id: req.params.id,
         value: req.body.value,
@@ -134,11 +134,10 @@ router.post("/:id/temp", (req, res, next) => {
                 changes: this.changes
             })
         })
-
 })
 
 
-router.post("/", (req, res, next) => {
+router.post("/", auth.verifyToken,  (req, res, next) => {
     const errors = []
     if (!req.body.name) {
         errors.push("No name specified")
@@ -193,7 +192,7 @@ router.post("/", (req, res, next) => {
     })
 })
 
-router.patch("/:id", (req, res, next) => {
+router.patch("/:id", auth.verifyToken, (req, res, next) => {
     const data = {
         name: req.body.name,
         sensor_type: req.body.sensor_type,
@@ -225,7 +224,7 @@ router.patch("/:id", (req, res, next) => {
         })
 })
 
-router.delete("/:id", (req, res, next) => {
+router.delete("/:id", auth.verifyToken, (req, res, next) => {
     db.run(
         'DELETE FROM sensors WHERE id = ?',
         req.params.id,
