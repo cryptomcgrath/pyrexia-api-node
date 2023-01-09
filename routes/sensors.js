@@ -1,5 +1,6 @@
 const express = require("express")
 const db = require("../database.js")
+const auth = require("../middleware/auth.js")
 
 const router = express.Router()
 
@@ -54,7 +55,7 @@ router.use(bodyParser.json())
  *                   items:
  *                     $ref: '#/components/schemas/Sensor'
  */
-router.get("/", (req, res, next) => {
+router.get("/", auth.verifyToken, (req, res, next) => {
     const sql = "select * from sensors"
     const params = []
     db.all(sql, params, (err, rows) => {
