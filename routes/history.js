@@ -8,14 +8,15 @@ router.use(bodyParser.json())
 
 
 router.get("/", (req, res, next) => {
-    let wheresql = ""
-    const params = [req.query.limit, req.query.offset]
-    if (req.query.program_id >= 1) {
-        wheresql = " where program_id = ?"
-        params.unshift(req.query.program_id)
+    let params = [req.query.program_id, req.query.limit, req.query.offset]
+    let wheresql = "where program_id = ?"
+    if (req.query.end_ts > 0) {
+        params = [req.query.program_id, req.query.end_ts, req.query.limit, req.query.offset]
+        wheresql = "where program_id = ? and action_ts < ?"
     }
-
     const sql = "select * from history " + wheresql + " order by action_ts desc limit ? offset ?"
+    console.log(sql)
+    console.log(params.join("|"))
 
     db.all(sql, params, (err, rows) => {
         if (err) {
