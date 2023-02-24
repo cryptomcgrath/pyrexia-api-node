@@ -47,7 +47,7 @@ router.get("/list", auth.verifyToken, (req, res, next) => {
     })
 })
 
-router.get("/:id", auth.verifyToken, (req, res, next) => {
+const getStat = (req, res, next) => {
     const sql = `SELECT p.id as program_id,
                       p.name as program_name,
                       p.sensor_id,
@@ -64,7 +64,9 @@ router.get("/:id", auth.verifyToken, (req, res, next) => {
                       c.min_run,
                       c.gpio,
                       c.gpio_on_hi,
-                      c.control_on
+                      c.control_on,
+                      c.run_capacity,
+                      c.total_run
         from programs p, sensors s, controls c
         WHERE p.sensor_id = s.id and
         p.control_id = c.id and p.id = ?`
@@ -72,16 +74,21 @@ router.get("/:id", auth.verifyToken, (req, res, next) => {
     db.get(sql, params, (err, row) => {
         if (err) {
             res.status(400).json({"error": err.message})
-            return
         }
+        const now_seconds = Math.floor(Date.now() / 1000)
+        row.current_time = now_seconds
         res.json({
             "message": "success",
-            "data": row
+            "data": row,
+            "current_time": now_seconds
         })
     })
-})
 
-router.post("/:id/increase", auth.verifyToken, (req, res, next) => {
+}
+
+router.get("/:id", auth.verifyToken, getStat)
+
+const increaseTemp = (req, res, next) => {
     const params = [req.params.id]
     const sql = "update programs set set_point=set_point+1 where id=?"
     db.run(sql, params, (err, dbresult) => {
@@ -89,13 +96,11 @@ router.post("/:id/increase", auth.verifyToken, (req, res, next) => {
             res.status(400).json({"error": err.message})
             return
         }
-        res.json({
-            "message": "success"
-        })
+        next()
     })
-})
+}
 
-router.post("/:id/decrease", auth.verifyToken, (req, res, next) => {
+const decreaseTemp = (req, res, next) => {
     const params = [req.params.id]
     const sql = "update programs set set_point=set_point-1 where id=?"
     db.run(sql, params, (err, dbresult) => {
@@ -103,13 +108,11 @@ router.post("/:id/decrease", auth.verifyToken, (req, res, next) => {
             res.status(400).json({"error": err.message})
             return
         }
-        res.json({
-            "message": "success"
-        })
+        next()
     })
-})
+}
 
-router.post("/:id/enable", auth.verifyToken, (req, res, next) => {
+const enableStat = (req, res, next) => {
     const params = [req.params.id]
     const sql = "update programs set enabled=1 where id=?"
     db.run(sql, params, (err, dbresult) => {
@@ -117,13 +120,11 @@ router.post("/:id/enable", auth.verifyToken, (req, res, next) => {
             res.status(400).json({"error": err.message})
             return
         }
-        res.json({
-            "message": "success"
-        })
+        next()
     })
-})
+}
 
-router.post("/:id/disable", auth.verifyToken,  (req, res, next) => {
+const disableStat = (req, res, next) => {
     const params = [req.params.id]
     const sql = "update programs set enabled=0 where id=?"
     db.run(sql, params, (err, dbresult) => {
@@ -131,11 +132,17 @@ router.post("/:id/disable", auth.verifyToken,  (req, res, next) => {
             res.status(400).json({"error": err.message})
             return
         }
-        res.json({
-            "message": "success"
-        })
+        next()
     })
-})
+}
+
+router.post("/:id/increase", auth.verifyToken, increaseTemp, getStat)
+
+router.post("/:id/decrease", auth.verifyToken, decreaseTemp, getStat)
+
+router.post("/:id/enable", auth.verifyToken, enableStat, getStat)
+
+router.post("/:id/disable", auth.verifyToken, disableStat, getStat)
 
 
 module.exports = router
