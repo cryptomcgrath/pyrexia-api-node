@@ -55,7 +55,7 @@ router.post("/login", (req, res) => {
                     { user_id: user[0].Id, email },
                       process.env.TOKEN_KEY,
                     {
-                      expiresIn: "1h", // 60s = 60 seconds - (60m = 60 minutes, 2h = 2 hours, 2d = 2 days)
+                      expiresIn: "365d", // 60s = 60 seconds - (60m = 60 minutes, 2h = 2 hours, 2d = 2 days)
                     }
                 )
                 user[0].token = token
